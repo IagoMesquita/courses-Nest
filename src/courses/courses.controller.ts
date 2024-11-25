@@ -20,23 +20,24 @@ export class CoursesController {
 
   @Get(':id')
   findOne(@Param('id') id: number) {
-    return this.courseService.findOne(+id)
+    return this.courseService.findOne(id)
   }
 
   @Post()
   create(@Body() createCourseDto: CreateCoursesDTO) {
-    return this.courseService.create(createCourseDto);
+    this.courseService.create(createCourseDto);
+    return createCourseDto;
   }
 
   @Put(':id')
   update(@Param('id') id: number, @Body() updateCourseDTO :UpdateCoursesDTO) {
-    return this.courseService.update(+id, updateCourseDTO);
+    return this.courseService.update(id, updateCourseDTO);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id') 
   remove(@Param('id') id: number) {
-    return this.courseService.delete(+id);
+    return this.courseService.delete(id);
   }
 
 }
