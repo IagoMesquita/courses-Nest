@@ -8,8 +8,8 @@ export class CoursesController {
   constructor(private readonly courseService: CoursesService) {}
 
   @Get()
-  findAll(@Res() response) {
-    const dataCourses = this.courseService.findAll();
+  async findAll(@Res() response) {
+    const dataCourses = await this.courseService.findAll();
     return response.status(200).json(dataCourses);
   }
 
