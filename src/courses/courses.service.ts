@@ -1,52 +1,53 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Course } from './courses.entity';
+import { Course } from './entities/courses.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CreateCoursesDTO } from './dto/create-courses.dto';
+import { UpdateCoursesDTO } from './dto/update-courses.dto';
 
 @Injectable()
 export class CoursesService {
-  private courses: Course[] = [
-    {
-      id: 1,
-      name: 'NestJS',
-      description: 'Framework Node para backend',
-      tags: ["backend", "node", "nestjs", "TS"]
-    }
-  ];
+  constructor(
+    @InjectRepository(Course)
+    private readonly courseRepository: Repository<Course>,
+  ) {}
 
-  findAll() {
-    return this.courses;
+  async findAll() {
+    return this.courseRepository.find();
   }
 
-  findOne(id: number) {
-    const course =  this.courses.find(c => c.id === id);
+  async findOne(id: number) {
+    const course = await this.courseRepository.findOne({ where: { id } });
 
-    if(!course) {
+    if (!course) {
       // throw new HttpException(`Id ${id} nao existe ou nao foi encontrado`, HttpStatus.NOT_FOUND);
       throw new NotFoundException(`Id ${id} nao existe ou nao foi encontrado`);
     }
     return course;
   }
 
-  create(createCourseDto: any) {
-    this.courses.push(createCourseDto);
-    return createCourseDto;
+  async create(createCourseDto: CreateCoursesDTO) {
+    const newCourse = this.courseRepository.create(createCourseDto);
+
+    return this.courseRepository.save(newCourse);
   }
 
-  update(id: number, updateCourseDto: any): void {
-    const existCourse = this.findOne(id);
+  async update(id: number, updateCourseDto: UpdateCoursesDTO) {
+    const course = await this.courseRepository.preload({
+      ...updateCourseDto,
+      id,
+    }); // -> Faz a busca e cria o objeto
 
-    if(existCourse) {
-      const index = this.courses.findIndex(c => c.id === id);
-
-      this.courses[index] = {
-        id, 
-        ...updateCourseDto
-      };
+    if (!course) {
+      throw new NotFoundException(`Id ${id} nao existe ou nao foi encontrado`);
     }
+
+    return this.courseRepository.save(course);
   }
 
-  delete(id: number): void {
-    const index = this.courses.findIndex(c => c.id === id);
+  async delete(id: number) {
+    const course = await this.findOne(id)
 
-    this.courses.splice(index, 1);
+    return this.courseRepository.remove(course);
   }
 }
