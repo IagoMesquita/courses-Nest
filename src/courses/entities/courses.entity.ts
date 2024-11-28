@@ -14,7 +14,9 @@ export class Course {
   description: string;
   
   @JoinTable()
-  @ManyToMany(() => Tag, (tag) => tag.courses)
+  @ManyToMany(() => Tag, (tag) => tag.courses, {
+    cascade: true,
+  })
   tags: Tag[];
 }
 
@@ -22,3 +24,4 @@ export class Course {
 // - primeiro parametro e o alvo ao qual entidade se relaciona
 // - segundo parametro e o iverso pega o elemento que deve estar na outra tabela
 // JoinTable e apenas para a tabela proprietaria, no nesse caso e Course, course possiu as tags
+// cacasde = true, toda atualuzacao que Course sofre, atualiza tags tbm.
