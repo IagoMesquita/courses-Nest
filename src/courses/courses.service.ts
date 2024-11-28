@@ -17,11 +17,14 @@ export class CoursesService {
   ) {}
 
   async findAll() {
-    return this.courseRepository.find();
+    return this.courseRepository.find({relations: ['tags']});
   }
 
   async findOne(id: number) {
-    const course = await this.courseRepository.findOne({ where: { id } });
+    const course = await this.courseRepository.findOne({
+      where: { id },
+      relations: ['tags'],
+    });
 
     if (!course) {
       // throw new HttpException(`Id ${id} nao existe ou nao foi encontrado`, HttpStatus.NOT_FOUND);
@@ -31,26 +34,29 @@ export class CoursesService {
   }
 
   async create(createCourseDto: CreateCoursesDTO) {
-
     const tags = await Promise.all(
-      createCourseDto.tags.map(name => this.preloadTagByName(name))
+      createCourseDto.tags.map((name) => this.preloadTagByName(name)),
     );
 
-    const newCourse = this.courseRepository.create({...createCourseDto, tags});
+    const newCourse = this.courseRepository.create({
+      ...createCourseDto,
+      tags,
+    });
 
     return this.courseRepository.save(newCourse);
   }
 
   async update(id: number, updateCourseDto: UpdateCoursesDTO) {
-    const tags = updateCourseDto.tags && await Promise.all(
-      updateCourseDto.tags.map(name => this.preloadTagByName(name))
-    );
-
+    const tags =
+      updateCourseDto.tags &&
+      (await Promise.all(
+        updateCourseDto.tags.map((name) => this.preloadTagByName(name)),
+      ));
 
     const course = await this.courseRepository.preload({
       ...updateCourseDto,
       id,
-      tags
+      tags,
     }); // -> Faz a busca e cria o objeto
 
     if (!course) {
