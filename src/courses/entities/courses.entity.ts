@@ -1,26 +1,47 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Tag } from "./tags.entity";
-import { RelationCountAttribute } from "typeorm/query-builder/relation-count/RelationCountAttribute";
+import {
+  BeforeInsert,
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Tag } from './tags.entity';
+import { randomUUID } from 'node:crypto';
 
 @Entity('courses')
 export class Course {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   name: string;
-  
+
   @Column()
   description: string;
-  
+
   @JoinTable()
   @ManyToMany(() => Tag, (tag) => tag.courses, {
     cascade: true,
   })
   tags: Tag[];
+
+  @CreateDateColumn({ type: 'timestamp' })
+  created_at: Date;
+
+  // Metodo para garantir que o id sera criado automaticamento
+  @BeforeInsert() // -> Decorate para executar esse metodo sempre antes de criar os dado e inserir no db
+  generatedId() {
+    if (this.id) {
+      return;
+    }
+
+    this.id = randomUUID();
+  }
 }
 
-// ManyToMany: 
+// ManyToMany:
 // - primeiro parametro e o alvo ao qual entidade se relaciona
 // - segundo parametro e o iverso pega o elemento que deve estar na outra tabela
 // JoinTable e apenas para a tabela proprietaria, no nesse caso e Course, course possiu as tags
