@@ -21,7 +21,7 @@ export class Course {
   @Column()
   description: string;
 
-  @JoinTable()
+  @JoinTable({name: 'courses_tags'}) // -> se eu nao passar esse name, o typeORM cria um automaticamente
   @ManyToMany(() => Tag, (tag) => tag.courses, {
     cascade: true,
   })
