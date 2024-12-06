@@ -14,7 +14,7 @@ describe('CoursesService unit tests', () => {
   let id: string;
   let created_at: Date;
   let expectOutputCourses: any;
-  let expectOutTags: any;
+  let expectOutputTags: any;
   let mockRepostitoryCourses: any;
   let mockRepostitoryTags: any;
 
@@ -22,12 +22,12 @@ describe('CoursesService unit tests', () => {
     id = randomUUID();
     created_at = new Date();
 
-    expectOutTags = [
+    expectOutputTags = [
       {
         id,
         name: 'TagsTest',
         created_at,
-      }
+      },
     ];
 
     expectOutputCourses = {
@@ -35,38 +35,33 @@ describe('CoursesService unit tests', () => {
       name: 'cursoTeste',
       description: 'teste de testes',
       created_at,
-      tags: expectOutTags,
+      tags: expectOutputTags,
     };
 
     mockRepostitoryCourses = {
-      find: jest.fn(),
-      findOne: jest.fn(),
-      create: jest.fn(),
-      save: jest.fn(),
-      preload: jest.fn(),
-      remove: jest.fn(),
+      find: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourses)),
+      findOne: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourses)),
+      create: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourses)),
+      save: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourses)),
+      preload: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourses)),
+      remove: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourses))
     };
+
+    mockRepostitoryTags = {
+      findOne: jest.fn().mockReturnValue(Promise.resolve(expectOutputTags)),
+      create: jest.fn(),
+    }
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CoursesService,
         {
           provide: getRepositoryToken(Course),
-          useValue: {
-            find: jest.fn(),
-            findOne: jest.fn(),
-            create: jest.fn(),
-            save: jest.fn(),
-            preload: jest.fn(),
-            remove: jest.fn(),
-          },
+          useValue: mockRepostitoryCourses,
         },
         {
           provide: getRepositoryToken(Tag),
-          useValue: {
-            findOne: jest.fn(),
-            create: jest.fn(),
-          },
+          useValue: mockRepostitoryTags,
         },
       ],
     }).compile();
