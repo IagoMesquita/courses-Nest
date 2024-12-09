@@ -102,4 +102,11 @@ describe('CoursesService unit tests', () => {
     expect(mockRepostitoryCourses.find).toHaveBeenCalled();
     expect(expectOutputCourses).toStrictEqual(coursesDb);
   });
+
+  it('should gets a course by id', async () => {
+    const courseDb = await service.findOne(id);
+
+    expect(mockRepostitoryCourses.findOne).toHaveBeenCalled();
+    expect(expectOutputCourses).toStrictEqual(courseDb);
+  });
 });
