@@ -6,6 +6,7 @@ import { Tag } from './entities/tags.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
 import { CreateCoursesDTO } from './dto/create-courses.dto';
+import { UpdateCoursesDTO } from './dto/update-courses.dto';
 
 describe('CoursesService unit tests', () => {
   let service: CoursesService;
@@ -109,4 +110,21 @@ describe('CoursesService unit tests', () => {
     expect(mockRepostitoryCourses.findOne).toHaveBeenCalled();
     expect(expectOutputCourses).toStrictEqual(courseDb);
   });
+
+  it('should update a course by id', async () => {
+
+    const updateCourseDTO: UpdateCoursesDTO = {
+      name: 'cursoTesteAtualizado',
+      description: 'Atualizando descricao',
+      tags: ['TagAtualizada'],
+    };
+
+    const course = await service.update(id, updateCourseDTO);
+
+    expect(mockRepostitoryCourses.preload).toHaveBeenCalled();
+    expect(mockRepostitoryCourses.save).toHaveBeenCalled();
+    expect(expectOutputCourses).toStrictEqual(course);
+
+  });
+  
 });
