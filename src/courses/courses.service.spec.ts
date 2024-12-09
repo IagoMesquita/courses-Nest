@@ -5,6 +5,7 @@ import { Course } from './entities/courses.entity';
 import { Tag } from './entities/tags.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
+import { CreateCoursesDTO } from './dto/create-courses.dto';
 
 describe('CoursesService unit tests', () => {
   let service: CoursesService;
@@ -44,13 +45,13 @@ describe('CoursesService unit tests', () => {
       create: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourses)),
       save: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourses)),
       preload: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourses)),
-      remove: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourses))
+      remove: jest.fn().mockReturnValue(Promise.resolve(expectOutputCourses)),
     };
 
     mockRepostitoryTags = {
       findOne: jest.fn().mockReturnValue(Promise.resolve(expectOutputTags)),
       create: jest.fn(),
-    }
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -60,7 +61,7 @@ describe('CoursesService unit tests', () => {
           useValue: mockRepostitoryCourses,
         },
         {
-          provide: getRepositoryToken(Tag),
+          provide: 'TagRepository',
           useValue: mockRepostitoryTags,
         },
       ],
@@ -76,5 +77,29 @@ describe('CoursesService unit tests', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  it('should create a course', async () => {
+    const createCourseDTO: CreateCoursesDTO = {
+      name: 'cursoTeste',
+      description: 'teste de testes',
+      tags: ['Test'],
+    };
+
+    const newCourse = await service.create(createCourseDTO);
+
+    console.log("newCoursae", newCourse);
+    console.log("ExpectCoursae", expectOutputCourses);
+
+    expect(mockRepostitoryCourses.save).toHaveBeenCalled();
+    expect(expectOutputCourses).toStrictEqual(newCourse);
+
+  });
+
+  it('should list all courses', async () => {
+    const coursesDb = await service.findAll();
+
+    expect(mockRepostitoryCourses.find).toHaveBeenCalled();
+    expect(expectOutputCourses).toStrictEqual(coursesDb);
   });
 });
