@@ -126,5 +126,14 @@ describe('CoursesService unit tests', () => {
     expect(expectOutputCourses).toStrictEqual(course);
 
   });
+
+  it('should delete a course', async () => {
+    const deleteCourse = await service.delete(id);
+
+    expect(mockRepostitoryCourses.findOne).toHaveBeenCalled();
+    expect(mockRepostitoryCourses.remove).toHaveBeenCalled();
+    expect(expectOutputCourses).toStrictEqual(deleteCourse);
+
+  });
   
 });
